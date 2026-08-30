@@ -95,16 +95,25 @@ scripts/                   ← build / deploy helpers
    ```
    UI swfs are under `vanilla/<pak>/Public/Game/GUI/`. Never commit `vanilla/`.
 
-## 4. Build & deploy
-```powershell
-scripts\build.ps1        # packs src/ → build/uissoca.pak and copies it to $MODS
-```
-Then launch the game → Mods → enable *uissoca* → load a save. The SE console should print
-`[uissoca] client loaded`.
+## 4. Dev loop vs. release build
+The game locks `uissoca.pak` while running, so packing is for releases only. For day-to-day
+work use **loose folders** in the game's `Data\` dir — SE reads Lua straight from disk and
+`!reset` in the console reloads it without restarting.
 
-Iteration tip: with `DeveloperMode` on, SE reloads Lua when you type `!reset` in the console,
-so Lua edits don't need a repack — just re-run `build.ps1` (it's fast) or copy the file
-straight into `MODS\uissoca\` as a loose folder (loose folders are loaded too).
+```bash
+scripts/dev-sync.sh   # copies src/ → DefEd\Data\{Mods,Public}\uissoca_<uuid> (loose), deletes the pak
+# ...edit Lua...  → scripts/dev-sync.sh → type !reset in the SE console
+scripts/dev-clean.sh  # remove the loose copy
+scripts/build.sh      # pack src/ → build/uissoca.pak → Documents\...\Mods  (game must be closed)
+```
+Never have both the loose copy and the pak at the same time — the game lists the mod twice.
+swf changes need a full restart even in loose mode (Flash files are loaded once).
+
+Verify: with the mod enabled, load a save; the SE console should print
+`[uissoca] client loaded` and `[uissoca] hotbar scaled to 1`.
+
+**SE console:** press any key to enter input mode. Plain lines are evaluated as Lua
+(`Ext.Utils.Print(Ext.UI.GetByType(40))`), `!reset` reloads all mod Lua, `!help` lists commands.
 
 ## 5. Where each feature lives
 ### New panels / overlays / behaviour → Lua

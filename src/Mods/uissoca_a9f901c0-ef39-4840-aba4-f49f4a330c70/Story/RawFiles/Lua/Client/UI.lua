@@ -8,7 +8,7 @@ local UITYPE = {
     statusConsole = 117,
     playerInfo = 118,
 }
-local SCALE = 1.0  -- TODO: make configurable
+local SCALE = 1.5  -- TODO: make configurable
 
 local function getUI(name)
     return Ext.UI.GetByType(UITYPE[name]) or Ext.UI.GetByPath("Public/Game/GUI/" .. name .. ".swf")
