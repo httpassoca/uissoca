@@ -19,6 +19,20 @@ local function holder(root) return root.hotbar_mc.slotholder_mc end
 -- Flash arrays are 0-indexed through SE; calling getSlot() returns a type SE can't marshal (type 12).
 local function slotAt(h, i) return h.slot_array[i] end
 
+-- Lua port of slotHolder.clearSlotMC (can't pass a Flash object as an AS3 argument from Lua).
+local function clearSlot(slot)
+    slot.inUse = false
+    slot.tooltip = ""
+    slot.handle = 0
+    slot.type = 0
+    slot.amount = 0
+    slot.isEnabled = false
+    slot.amount_mc.visible = false
+    slot.disable_mc.visible = false
+    slot.unavailable_mc.visible = false
+    slot.refreshSlot_mc.visible = false
+end
+
 local function playerChar()
     local pm = Ext.Entity.GetPlayerManager()
     local data = pm and pm.ClientPlayerData and pm.ClientPlayerData[1]
@@ -68,10 +82,10 @@ local function renderRow(root, char, row, bar)
                 if item then
                     h.setSlot(idx, "", true, Ext.UI.HandleToDouble(item.Handle), 2, item.Amount or 0)
                 else
-                    h.clearSlotMC(slot)
+                    clearSlot(slot)
                 end
             else
-                h.clearSlotMC(slot)
+                clearSlot(slot)
             end
         end
     end
