@@ -32,7 +32,7 @@ change/add files → pack → test → upload.** Each tool covers one arrow.
 - Norbyte's DLL that hooks the game and exposes UI/stats/characters to Lua. Needed for
   anything dynamic (overlays, runtime scaling, event reactions).
 - Install: https://github.com/Norbyte/ositools/releases → copy `DXGI.dll` to `DefEd\bin\`.
-- Create `DefEd\bin\ScriptExtenderSettings.json`:
+- Create `DefEd\bin\OsirisExtenderSettings.json`:
   ```json
   { "CreateConsole": true, "DeveloperMode": true, "EnableLogging": true }
   ```
@@ -59,7 +59,7 @@ Paths used below:
   (WSL: `/mnt/c/Program Files (x86)/Steam/steamapps/common/Divinity Original Sin 2`)
 - `MODS` = `%USERPROFILE%\Documents\Larian Studios\Divinity Original Sin 2 Definitive Edition\Mods`
 
-Enable the SE console: edit `GAME\DefEd\bin\ScriptExtenderSettings.json`:
+Enable the SE console: edit `GAME\DefEd\bin\OsirisExtenderSettings.json`:
 ```json
 { "CreateConsole": true, "DeveloperMode": true, "EnableLogging": true }
 ```
@@ -145,7 +145,7 @@ straight into `MODS\uissoca\` as a loose folder (loose folders are loaded too).
 ## 8. Troubleshooting
 **Game stuck on loading / never reaches main menu.** Check `DefEd\bin\gold.log`: if the last
 line is `Client Thread start: LoadMenu`, it hung loading the menu. Bisect in this order:
-1. `ScriptExtenderSettings.json` → `"CreateConsole": false`. In fullscreen the console window
+1. `OsirisExtenderSettings.json` → `"CreateConsole": false`. In fullscreen the console window
    steals focus and the game can look frozen/black. Use borderless window when developing.
 2. Rename `DefEd\bin\dxgi.dll` → `dxgi.dll.off` and relaunch. Loads? Then SE is the issue —
    check `%LOCALAPPDATA%\DOS2ScriptExtender\` (updater cache; it must contain
