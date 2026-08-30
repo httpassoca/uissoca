@@ -112,8 +112,16 @@ swf changes need a full restart even in loose mode (Flash files are loaded once)
 Verify: with the mod enabled, load a save; the SE console should print
 `[uissoca] client loaded` and `[uissoca] hotbar scaled to 1`.
 
-**SE console:** press any key to enter input mode. Plain lines are evaluated as Lua
-(`Ext.Utils.Print(Ext.UI.GetByType(40))`), `!reset` reloads all mod Lua, `!help` lists commands.
+**SE console cheat-sheet.** Press any key to enter console mode (prompt `S >>`). It starts
+in the *server* context; UI code lives on the *client*, so switch first. Inside the console,
+built-in commands have no `!`; mod-registered commands keep it:
+```
+S >> client            switch to client context  (prompt becomes C >>)
+C >> reset             reload all mod Lua (also: reset client / reset server)
+C >> !uiscale 1.3      mod command (Ext.RegisterConsoleCommand) — scales the hotbar live
+C >> Ext.Utils.Print(Ext.UI.GetByType(40):GetRoot().y)   any Lua line runs in that context
+C >> exit              leave console mode
+```
 
 ## 5. Where each feature lives
 ### New panels / overlays / behaviour → Lua
