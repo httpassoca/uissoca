@@ -65,6 +65,7 @@ scripts/build.sh      # RELEASE only: pack → Documents\...\Mods\uissoca.pak (g
   statusConsole=117, playerInfo=118, characterSheet=119. Full list in SE API.md "Built-in UI types".
 - `ui:GetRoot()` is the full-screen stage (≈1948×1192 at the user's res). Scaling the root scales the
   whole canvas and pushes bottom-anchored bars off-screen. Scale the inner clip instead.
+- Hotbar internals + stacked-rows design: `docs/hotbar-rows.md`. Console: `!hotbarrows N`.
 - `hotBar.swf` clip names (from `vanilla/Game/Public/Game/GUI/hotBar.swf`): `hotbar_mc` (the bar),
   inside it `slotholder_mc`, `basebar_mc`, `basebarFrame_mc`, `hotkeys_mc`, `key1_mc..key12_mc`,
   `cycleHotBar_mc`, `lockButton_mc`, `actionsButton_mc`, `expBar_mc`, `chatBtn_mc`, `showLog_mc`,
@@ -73,6 +74,12 @@ scripts/build.sh      # RELEASE only: pack → Documents\...\Mods\uissoca.pak (g
 - Get clip names for any panel without JPEXS: zlib-inflate the swf (CWS) and grep `[A-Za-z_]+_mc`.
 - Vanilla GUI extracted to `vanilla/Game/Public/Game/GUI/` (132 swfs, git-ignored). `Shared.pak` has no UI.
   Re-extract: `Divine.exe -g dos2de -a extract-package -s <Game.pak> -d vanilla/Game -x '*/GUI/*'`.
+
+## Tooling from WSL
+- JPEXS CLI: `powershell.exe -NoProfile -Command "& 'C:\Program Files (x86)\FFDec\ffdec-cli.exe' -export script <outdir> <swf>"`
+  (also `-importScript` to compile edited AS3 back). Vanilla hotBar AS3 already exported to
+  `vanilla/as3/hotBar/scripts/` (git-ignored) — read `hotBar_fla/slotHolder_14.as`, `MainTimeline.as`, `bottombar_1.as`.
+- Feature notes live in `docs/<feature>.md` (see `docs/hotbar-rows.md`).
 
 ## Conventions
 - Prefix all console output with `[uissoca]`. Wrap UI mutations in `pcall` and `PrintError` failures.
