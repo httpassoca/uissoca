@@ -12,21 +12,23 @@ local function geom(root)
     return string.format("x=%.1f y=%.1f w=%.1f h=%.1f scale=%.2f", root.x, root.y, root.width, root.height, root.scaleX)
 end
 
--- Scale the hotbar around its bottom-centre so it stays anchored to the screen edge.
+-- Scale hotbar_mc (the bar itself; the root is the full-screen stage) around its bottom-centre.
 local function applyHotbarScale(s)
     local ui = getUI("hotBar")
     if not ui then Ext.Utils.Print("[uissoca] hotBar UI not found"); return end
     local root = ui:GetRoot()
+    local bar = root.hotbar_mc
+    if not bar then Ext.Utils.Print("[uissoca] root.hotbar_mc not found"); return end
     if not state.base then
-        state.base = { x = root.x, y = root.y, w = root.width, h = root.height }
-        Ext.Utils.Print("[uissoca] hotbar base: " .. geom(root))
+        state.base = { x = bar.x, y = bar.y, w = bar.width, h = bar.height }
+        Ext.Utils.Print("[uissoca] hotbar base: " .. geom(bar))
     end
     local b = state.base
-    root.scaleX, root.scaleY = s, s
-    root.x = b.x - (b.w * (s - 1)) / 2     -- keep horizontal centre
-    root.y = b.y - (b.h * (s - 1))         -- keep bottom edge
+    bar.scaleX, bar.scaleY = s, s
+    bar.x = b.x - (b.w * (s - 1)) / 2     -- keep horizontal centre
+    bar.y = b.y - (b.h * (s - 1))         -- keep bottom edge
     state.scale = s
-    Ext.Utils.Print("[uissoca] hotbar now: " .. geom(root))
+    Ext.Utils.Print("[uissoca] hotbar now: " .. geom(bar))
 end
 
 local function apply()
