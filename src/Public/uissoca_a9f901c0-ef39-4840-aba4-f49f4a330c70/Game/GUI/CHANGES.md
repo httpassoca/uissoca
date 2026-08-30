@@ -1,2 +1,5 @@
 # swf change log
-Record every JPEXS edit here (file, node, what/why) so it can be redone after a game patch.
+Generated files — do not hand-edit. Rebuild with `scripts/patch-swf.sh` (JPEXS importScript).
+| swf | patch | what |
+|---|---|---|
+| hotBar.swf | tools/as3-patches/hotBar.py | slotHolder.initSlot builds 5×29 slots in stacked rows, adds per-slot hit rect + `iggy_uissoca_slot_<i>` icon clip; getSlotOnXY resolves rows from y |
