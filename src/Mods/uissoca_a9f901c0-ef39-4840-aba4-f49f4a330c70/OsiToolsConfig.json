@@ -1,5 +1,5 @@
 {
-  "RequiredVersion": 56,
+  "RequiredExtensionVersion": 56,
   "ModTable": "uissoca",
   "FeatureFlags": ["Lua"]
 }

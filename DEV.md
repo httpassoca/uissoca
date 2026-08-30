@@ -38,8 +38,9 @@ change/add files → pack → test → upload.** Each tool covers one arrow.
   ```
   `CreateConsole` = a console window showing `Ext.Utils.Print` output and Lua errors;
   `DeveloperMode` = `!reset` hot-reloads Lua without repacking.
-- Nothing to click: `src/Mods/uissoca_<uuid>/ScriptExtender/Config.json` tells SE to load Lua for
-  this mod and `BootstrapClient.lua` runs on session load.
+- Nothing to click: `src/Mods/uissoca_<uuid>/OsiToolsConfig.json` tells SE to load Lua for
+  this mod and `Story/RawFiles/Lua/BootstrapClient.lua` runs on session load.
+  (BG3 uses `ScriptExtender/Config.json` + `ScriptExtender/Lua/` — that layout does NOT work in DOS2.)
 
 ### JPEXS Free Flash Decompiler — edit .swf UI files
 - Only for *restyling* existing panels (colors, layout, fonts baked into the swf).
@@ -69,7 +70,7 @@ Enable the SE console: edit `GAME\DefEd\bin\OsirisExtenderSettings.json`:
 src/                       → contents of uissoca.pak
   Mods/uissoca_<uuid>/   (folder name must equal meta.lsx Folder attr)
     meta.lsx               ← generate with Engine 2 (step 3), contains the mod UUID
-    ScriptExtender/
+    Story/RawFiles/Lua/
       Config.json          ← enables Lua for this mod
       Lua/
         BootstrapClient.lua  ← UI work lives client-side
@@ -107,7 +108,7 @@ straight into `MODS\uissoca\` as a loose folder (loose folders are loaded too).
 
 ## 5. Where each feature lives
 ### New panels / overlays / behaviour → Lua
-- Entry: `src/Mods/uissoca_<uuid>/ScriptExtender/Lua/BootstrapClient.lua`.
+- Entry: `src/Mods/uissoca_<uuid>/Story/RawFiles/Lua/BootstrapClient.lua`.
 - Hook `Ext.Events.SessionLoaded` (UI exists from then on).
 - Existing panels: `Ext.UI.GetByType(id)` / `Ext.UI.GetByName("hotBar")`, then
   `ui:GetRoot()` gives the Flash object tree (`root.hotbar_mc.x = ...`).
@@ -160,5 +161,5 @@ Original Sin 2 Definitive Edition\Mods` (not LocalAppData), and the folder names
 pak must match meta.lsx `Folder`.
 
 **No `[uissoca]` line in the console.** SE didn't load Lua for the mod: check
-`ScriptExtender/Config.json` exists at `Mods/uissoca_<uuid>/ScriptExtender/Config.json`
+`OsiToolsConfig.json` exists at `Mods/uissoca_<uuid>/OsiToolsConfig.json`
 and the mod is *enabled* (modsettings.lsx lists it) — SE only loads Lua for active mods.
