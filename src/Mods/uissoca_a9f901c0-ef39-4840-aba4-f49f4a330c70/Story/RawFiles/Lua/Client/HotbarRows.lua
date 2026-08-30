@@ -16,6 +16,15 @@ local function ui() return Ext.UI.GetByType(HOTBAR) end
 
 local function holder(root) return root.hotbar_mc.slotholder_mc end
 
+-- Flash arrays are 0-indexed through SE; calling getSlot() returns a type SE can't marshal (type 12).
+local function slotAt(h, i) return h.slot_array[i] end
+
+local function playerChar()
+    local pm = Ext.Entity.GetPlayerManager()
+    local data = pm and pm.ClientPlayerData and pm.ClientPlayerData[1]
+    return data and Ext.Entity.GetCharacter(data.CharacterNetId) or nil
+end
+
 -- Make sure slot_array has rows*29 slots and the extra ones are laid out above the bar.
 local function ensureSlots(root)
     local h = holder(root)
@@ -24,7 +33,7 @@ local function ensureSlots(root)
     while h.slot_array.length < want and guard < BARS do h.initSlot(); guard = guard + 1 end
     local cw, ch, sp = h.cellWidth, h.cellHeight, h.cellSpacing
     for i = SLOTS_PER_BAR, h.slot_array.length - 1 do
-        local s = h.getSlot(i)
+        local s = slotAt(h, i)
         if s then
             local row, col = math.floor(i / SLOTS_PER_BAR), i % SLOTS_PER_BAR
             s.id = i                      -- initSlot restarts ids at 0; make them unique
@@ -47,7 +56,7 @@ local function renderRow(root, char, row, bar)
     for col = 0, SLOTS_PER_BAR - 1 do
         local idx = row * SLOTS_PER_BAR + col           -- slot index in slot_array
         local data = items[(bar - 1) * SLOTS_PER_BAR + col + 1]
-        local slot = h.getSlot(idx)
+        local slot = slotAt(h, idx)
         if slot and data then
             local t = data.Type
             if t == "Skill" or t == "Action" then
@@ -73,7 +82,7 @@ function M.Render()
     local root = u:GetRoot()
     if not root.hotbar_mc or not root.hotbar_mc.slotholder_mc then return end
     ensureSlots(root)
-    local char = Ext.Entity.GetCharacter(u:GetPlayerHandle())
+    local char = playerChar()
     if not char then return end
     local cur = currentBar(root)
     local row = 1
