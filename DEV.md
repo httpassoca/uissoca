@@ -8,12 +8,50 @@ All game tooling is Windows-side. Edit/git from WSL; run the tools from Windows
 (PowerShell) or via `cmd.exe /c` from WSL.
 
 ## 1. Toolchain (Windows)
-| Tool | Purpose | Get it |
-|---|---|---|
-| Divinity Engine 2 | generate `meta.lsx`, publish to Workshop | Steam → Library → Tools |
-| Script Extender | Lua runtime + UI API | https://github.com/Norbyte/ositools/releases — copy `DXGI.dll` to `<game>\DefEd\bin\` |
-| LSLib / ConverterApp (`divine.exe`) | unpack game `.pak`s, pack the mod | https://github.com/Norbyte/lslib/releases |
-| JPEXS Free Flash Decompiler | edit `.swf` | https://github.com/jindrapetrik/jpexs-decompiler |
+A mod is a `.pak` archive dropped in the Mods folder. Files inside either *replace* vanilla
+files (same relative path wins) or *add* new ones. Workflow: **look at vanilla files →
+change/add files → pack → test → upload.** Each tool covers one arrow.
+
+### LSLib (`ConverterApp.exe` GUI / `divine.exe` CLI) — unpack & pack
+- Vanilla UI lives inside `Shared.pak`, `Game.pak`, `Patch*.pak`; LSLib extracts them and
+  packs `src/` back into `uissoca.pak`.
+- Install: https://github.com/Norbyte/lslib/releases → extract zip to `C:\Tools\lslib\`.
+- GUI: `ConverterApp.exe` → *PAK / LSV Tools* → *Extract Package* (source `DefEd\Data\Shared.pak`,
+  dest `vanilla\Shared`). CLI: used by `scripts\build.ps1` (set `$env:DIVINE` to `divine.exe`).
+
+### Divinity Engine 2 — mod identity & Workshop upload
+- Larian's official editor (Steam → Library → Tools). Used for exactly two things:
+  generating `meta.lsx` (mod UUID/name/version/deps — required for the game to list the
+  mod) and the *Publish to Workshop* button. Not used for editing UI.
+- Use: *Project → New Project*, name `uissoca`, type **Add-on**, deps Shared + Origins.
+  Copy `DefEd\Data\Mods\uissoca_<uuid>\meta.lsx` → `src\Mods\uissoca\meta.lsx`; check its
+  `Folder` attribute equals `uissoca`.
+
+### Script Extender (SE) — Lua inside the game
+- Norbyte's DLL that hooks the game and exposes UI/stats/characters to Lua. Needed for
+  anything dynamic (overlays, runtime scaling, event reactions).
+- Install: https://github.com/Norbyte/ositools/releases → copy `DXGI.dll` to `DefEd\bin\`.
+- Create `DefEd\bin\ScriptExtenderSettings.json`:
+  ```json
+  { "CreateConsole": true, "DeveloperMode": true, "EnableLogging": true }
+  ```
+  `CreateConsole` = a console window showing `Ext.Utils.Print` output and Lua errors;
+  `DeveloperMode` = `!reset` hot-reloads Lua without repacking.
+- Nothing to click: `src/Mods/uissoca/ScriptExtender/Config.json` tells SE to load Lua for
+  this mod and `BootstrapClient.lua` runs on session load.
+
+### JPEXS Free Flash Decompiler — edit .swf UI files
+- Only for *restyling* existing panels (colors, layout, fonts baked into the swf).
+- Install: https://github.com/jindrapetrik/jpexs-decompiler/releases (build "with Java").
+- Use: copy the vanilla swf into `src/Public/uissoca/Game/GUI/`, open the copy. Tree:
+  *shapes* (vector art/colors), *images*, *fonts*, *sprites* (layout), *scripts* (AS3 logic).
+  Edit → Save → log the change in `CHANGES.md`.
+
+### First-run order
+1. SE (`DXGI.dll` + settings) → launch game once, confirm the console window appears.
+2. Engine 2 → create project → copy `meta.lsx`.
+3. LSLib → `scripts/build.sh` → enable mod in game → console prints `[uissoca] client loaded`.
+4. JPEXS only when you start restyling.
 
 Paths used below:
 - `GAME` = `C:\Program Files (x86)\Steam\steamapps\common\Divinity Original Sin 2`
