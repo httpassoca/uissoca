@@ -44,9 +44,6 @@ Ext.RegisterConsoleCommand("uiscale", function(_, val)
 end)
 
 -- After `!reset` SessionLoaded doesn't re-fire; re-apply on the next tick if we're already in-game.
-Ext.Events.Tick:Subscribe(function(e)
-    Ext.Events.Tick:Unsubscribe(e.Handle or 0)
-end)
 pcall(function()
     if Ext.Client.GetGameState() == "Running" then apply() end
 end)
