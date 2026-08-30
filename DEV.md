@@ -24,8 +24,9 @@ change/add files → pack → test → upload.** Each tool covers one arrow.
   generating `meta.lsx` (mod UUID/name/version/deps — required for the game to list the
   mod) and the *Publish to Workshop* button. Not used for editing UI.
 - Use: *Project → New Project*, name `uissoca`, type **Add-on**, deps Shared + Origins.
-  Copy `DefEd\Data\Mods\uissoca_<uuid>\meta.lsx` → `src\Mods\uissoca\meta.lsx`; check its
-  `Folder` attribute equals `uissoca`.
+  Copy `DefEd\Data\Mods\uissoca_<uuid>\meta.lsx` → `src\Mods\uissoca_<uuid>\meta.lsx`. The folder
+  names under `src/Mods` and `src/Public` must equal meta.lsx's `Folder` attribute
+  (`uissoca_<uuid>`) — already done in this repo.
 
 ### Script Extender (SE) — Lua inside the game
 - Norbyte's DLL that hooks the game and exposes UI/stats/characters to Lua. Needed for
@@ -37,13 +38,13 @@ change/add files → pack → test → upload.** Each tool covers one arrow.
   ```
   `CreateConsole` = a console window showing `Ext.Utils.Print` output and Lua errors;
   `DeveloperMode` = `!reset` hot-reloads Lua without repacking.
-- Nothing to click: `src/Mods/uissoca/ScriptExtender/Config.json` tells SE to load Lua for
+- Nothing to click: `src/Mods/uissoca_<uuid>/ScriptExtender/Config.json` tells SE to load Lua for
   this mod and `BootstrapClient.lua` runs on session load.
 
 ### JPEXS Free Flash Decompiler — edit .swf UI files
 - Only for *restyling* existing panels (colors, layout, fonts baked into the swf).
 - Install: https://github.com/jindrapetrik/jpexs-decompiler/releases (build "with Java").
-- Use: copy the vanilla swf into `src/Public/uissoca/Game/GUI/`, open the copy. Tree:
+- Use: copy the vanilla swf into `src/Public/uissoca_<uuid>/Game/GUI/`, open the copy. Tree:
   *shapes* (vector art/colors), *images*, *fonts*, *sprites* (layout), *scripts* (AS3 logic).
   Edit → Save → log the change in `CHANGES.md`.
 
@@ -56,7 +57,7 @@ change/add files → pack → test → upload.** Each tool covers one arrow.
 Paths used below:
 - `GAME` = `C:\Program Files (x86)\Steam\steamapps\common\Divinity Original Sin 2`
   (WSL: `/mnt/c/Program Files (x86)/Steam/steamapps/common/Divinity Original Sin 2`)
-- `MODS` = `%LOCALAPPDATA%\Larian Studios\Divinity Original Sin 2 Definitive Edition\Mods`
+- `MODS` = `%USERPROFILE%\Documents\Larian Studios\Divinity Original Sin 2 Definitive Edition\Mods`
 
 Enable the SE console: edit `GAME\DefEd\bin\ScriptExtenderSettings.json`:
 ```json
@@ -66,7 +67,7 @@ Enable the SE console: edit `GAME\DefEd\bin\ScriptExtenderSettings.json`:
 ## 2. Repo layout
 ```
 src/                       → contents of uissoca.pak
-  Mods/uissoca/
+  Mods/uissoca_<uuid>/   (folder name must equal meta.lsx Folder attr)
     meta.lsx               ← generate with Engine 2 (step 3), contains the mod UUID
     ScriptExtender/
       Config.json          ← enables Lua for this mod
@@ -74,7 +75,7 @@ src/                       → contents of uissoca.pak
         BootstrapClient.lua  ← UI work lives client-side
         BootstrapServer.lua
         Client/*.lua
-  Public/uissoca/
+  Public/uissoca_<uuid>/
     Game/GUI/*.swf         ← overrides: same relative path as vanilla wins
 vanilla/                   ← unpacked vanilla assets for reference (git-ignored)
 scripts/                   ← build / deploy helpers
@@ -83,8 +84,7 @@ scripts/                   ← build / deploy helpers
 ## 3. First-time setup
 1. In Divinity Engine 2: **Project → New**, name `uissoca`, type *Add-on*, dependencies
    Shared + Origins. Save. Copy the generated `Mods\uissoca_<uuid>\meta.lsx` into
-   `src/Mods/uissoca/meta.lsx` (keep the folder name `uissoca` — meta.lsx's `Folder`
-   attribute must match; edit it if the Engine appended a UUID).
+   `src/Mods/uissoca_<uuid>/meta.lsx` (already done).
 2. Unpack vanilla UI for reference (PowerShell):
    ```powershell
    $d = "path\to\divine.exe"
@@ -107,7 +107,7 @@ straight into `MODS\uissoca\` as a loose folder (loose folders are loaded too).
 
 ## 5. Where each feature lives
 ### New panels / overlays / behaviour → Lua
-- Entry: `src/Mods/uissoca/ScriptExtender/Lua/BootstrapClient.lua`.
+- Entry: `src/Mods/uissoca_<uuid>/ScriptExtender/Lua/BootstrapClient.lua`.
 - Hook `Ext.Events.SessionLoaded` (UI exists from then on).
 - Existing panels: `Ext.UI.GetByType(id)` / `Ext.UI.GetByName("hotBar")`, then
   `ui:GetRoot()` gives the Flash object tree (`root.hotbar_mc.x = ...`).
@@ -118,10 +118,10 @@ straight into `MODS\uissoca\` as a loose folder (loose folders are loaded too).
 
 ### Restyle existing menus → .swf overrides
 1. Copy the vanilla swf (e.g. `hotBar.swf`, `characterSheet.swf`,
-   `inventorySkillPanel.swf`) from `vanilla/` to `src/Public/uissoca/Game/GUI/`.
+   `inventorySkillPanel.swf`) from `vanilla/` to `src/Public/uissoca_<uuid>/Game/GUI/`.
 2. Open in JPEXS: shapes/colors under *shapes*, layout in *sprites*, logic in *scripts*
    (ActionScript 3). Save as swf (uncompressed is fine).
-3. Log what you changed in `src/Public/uissoca/Game/GUI/CHANGES.md` — swf edits aren't
+3. Log what you changed in `src/Public/uissoca_<uuid>/Game/GUI/CHANGES.md` — swf edits aren't
    diffable, and you'll need to redo them after a game patch replaces the base file.
 
 ### Bigger UI / fonts
@@ -141,3 +141,24 @@ straight into `MODS\uissoca\` as a loose folder (loose folders are loaded too).
 - [ ] 1080p, 1440p, 4K — nothing clipped
 - [ ] Controller mode (it uses different swfs — `*_c.swf`; leave or handle separately)
 - [ ] Fresh Workshop subscribe on a clean profile actually installs the pak
+
+## 8. Troubleshooting
+**Game stuck on loading / never reaches main menu.** Check `DefEd\bin\gold.log`: if the last
+line is `Client Thread start: LoadMenu`, it hung loading the menu. Bisect in this order:
+1. `ScriptExtenderSettings.json` → `"CreateConsole": false`. In fullscreen the console window
+   steals focus and the game can look frozen/black. Use borderless window when developing.
+2. Rename `DefEd\bin\dxgi.dll` → `dxgi.dll.off` and relaunch. Loads? Then SE is the issue —
+   check `%LOCALAPPDATA%\DOS2ScriptExtender\` (updater cache; it must contain
+   `ScriptExtender\<ver>\OsiExtenderEoCApp.dll`) and the SE console for errors.
+3. Move the Engine's loose project out of the game dir: `DefEd\Data\Mods\uissoca_<uuid>`,
+   `DefEd\Data\Public\uissoca_<uuid>`, `DefEd\Data\Projects\uissoca_<uuid>`. The game scans
+   loose folders in `Data\Mods`; a half-built project there can break module loading. Keep
+   Engine projects only while the Engine is open, or work from the pak in the Mods folder.
+
+**Mod not in the Mods menu.** `uissoca.pak` must be in `Documents\Larian Studios\Divinity
+Original Sin 2 Definitive Edition\Mods` (not LocalAppData), and the folder names inside the
+pak must match meta.lsx `Folder`.
+
+**No `[uissoca]` line in the console.** SE didn't load Lua for the mod: check
+`ScriptExtender/Config.json` exists at `Mods/uissoca_<uuid>/ScriptExtender/Config.json`
+and the mod is *enabled* (modsettings.lsx lists it) — SE only loads Lua for active mods.

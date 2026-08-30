@@ -13,7 +13,7 @@ UI improvements for **Divinity: Original Sin 2 – Definitive Edition**.
 
 ## Install
 1. Drop `uissoca.pak` into
-   `%LOCALAPPDATA%\Larian Studios\Divinity Original Sin 2 Definitive Edition\Mods`
+   `%USERPROFILE%\Documents\Larian Studios\Divinity Original Sin 2 Definitive Edition\Mods`
    (or subscribe on the Steam Workshop).
 2. Launch the game → **Mods** → enable *uissoca* → load a save.
 
